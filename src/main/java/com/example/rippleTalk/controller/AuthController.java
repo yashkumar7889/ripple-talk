@@ -1,12 +1,24 @@
 package com.example.rippleTalk.controller;
 
 import com.example.rippleTalk.dto.RegisterRequest;
+import com.example.rippleTalk.dto.UserDto;
+import com.example.rippleTalk.service.AuthService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController
 {
+    private final AuthService authService;
+
+    // Constructor injection
+    public AuthController(final AuthService authService)
+    {
+        this.authService = authService;
+    }
+
     @GetMapping("/message")
     public String getMessage()
     {
@@ -14,9 +26,9 @@ public class AuthController
     }
 
     @PostMapping("/register")
-    public String registerUser(@RequestBody RegisterRequest request)
+    public ResponseEntity<UserDto> registerUser(@RequestBody RegisterRequest request)
     {
-        System.out.println(request.toString());
-        return null;
+        UserDto createdUser = authService.registerUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 }

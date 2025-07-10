@@ -17,7 +17,7 @@ public class User {
 
     @Id
     @Column(length = 36)
-    private String id;  // UUID stored as CHAR(36) in MySQL
+    private String id;
 
     @Column(nullable = false, unique = true, length = 100)
     private String username;
