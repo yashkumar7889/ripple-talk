@@ -29,6 +29,11 @@ public class AuthService {
             throw new IllegalArgumentException("Email already in use");
         }
 
+        if (userRepository.existsByUsername(request.getUserName()))
+        {
+            throw new IllegalArgumentException("Username already taken");
+        }
+
         User user = new User();
         user.setId(UUID.randomUUID().toString());
         user.setUsername(request.getUserName());
