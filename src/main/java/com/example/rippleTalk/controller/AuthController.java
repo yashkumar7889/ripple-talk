@@ -1,5 +1,7 @@
 package com.example.rippleTalk.controller;
 
+import com.example.rippleTalk.dto.LoginRequest;
+import com.example.rippleTalk.dto.LoginResponse;
 import com.example.rippleTalk.dto.RegisterRequest;
 import com.example.rippleTalk.dto.UserDto;
 import com.example.rippleTalk.service.AuthService;
@@ -30,5 +32,12 @@ public class AuthController
     {
         UserDto createdUser = authService.registerUser(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+        System.out.println("Login endpoint hit");
+        String token = authService.authenticate(request);
+        return ResponseEntity.ok(new LoginResponse(token));
     }
 }
