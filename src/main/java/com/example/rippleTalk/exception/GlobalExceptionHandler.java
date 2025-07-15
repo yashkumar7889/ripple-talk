@@ -31,6 +31,13 @@ public class GlobalExceptionHandler {
                 .body("Invalid username or password");
     }
 
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<String> handleBadRequest(BadRequestException ex) {
+        return ResponseEntity
+                .badRequest()
+                .body(ex.getMessage());
+    }
+
     // Fallback for catching exception
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGeneric(Exception ex)

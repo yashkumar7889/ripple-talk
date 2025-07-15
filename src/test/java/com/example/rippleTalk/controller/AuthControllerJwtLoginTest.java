@@ -115,4 +115,25 @@ public class AuthControllerJwtLoginTest
         assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
         assertEquals("Invalid username or password", response.getBody());
     }
+
+    @Test
+    void testLoginWithEmptyPayload()
+    {
+        // Create empty JSON payload
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> entity = new HttpEntity<>("{}", headers); // Empty JSON object
+
+        ResponseEntity<String> response = restTemplate.exchange(
+                "/api/auth/login",
+                HttpMethod.POST,
+                entity,
+                String.class
+        );
+
+        // Assert 400 Bad Request
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Username and Password must not be null or blank", response.getBody());
+    }
 }
