@@ -32,10 +32,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<String> handleBadRequest(BadRequestException ex) {
-        return ResponseEntity
-                .badRequest()
-                .body(ex.getMessage());
+    public ResponseEntity<Map<String, String>> handleBadRequest(BadRequestException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Invalid username or password");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
     // Fallback for catching exception

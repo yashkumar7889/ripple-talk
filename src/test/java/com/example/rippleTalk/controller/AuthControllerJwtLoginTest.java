@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -135,5 +136,40 @@ public class AuthControllerJwtLoginTest
         // Assert 400 Bad Request
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("Username and Password must not be null or blank", response.getBody());
+    }
+
+    @Test
+    void testAlreadyLoggedIn_TokenReuse() {
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUserName(testUsername);
+        loginRequest.setPassword(password);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<LoginRequest> requestEntity = new HttpEntity<>(loginRequest, headers);
+
+        // First login
+        ResponseEntity<LoginResponse> firstResponse = restTemplate.exchange(
+                "/api/auth/login",
+                HttpMethod.POST,
+                requestEntity,
+                LoginResponse.class
+        );
+
+        assertEquals(HttpStatus.OK, firstResponse.getStatusCode());
+        assertNotNull(firstResponse.getBody());
+        String token = firstResponse.getBody().getToken();
+
+        // Second login (simulate reuse scenario)
+        ResponseEntity<LoginResponse> secondResponse = restTemplate.exchange(
+                "/api/auth/login",
+                HttpMethod.POST,
+                requestEntity,
+                LoginResponse.class
+        );
+
+        assertEquals(HttpStatus.OK, secondResponse.getStatusCode());
+        assertNotNull(secondResponse.getBody());
+        assertEquals(firstResponse.getBody().getToken(), secondResponse.getBody().getToken());
     }
 }
