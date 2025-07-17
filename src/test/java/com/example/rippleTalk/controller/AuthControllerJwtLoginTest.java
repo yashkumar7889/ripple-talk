@@ -6,6 +6,7 @@ import com.example.rippleTalk.entity.User;
 import com.example.rippleTalk.repository.UserRepository;
 import com.example.rippleTalk.security.JwtUtils;
 import com.example.rippleTalk.util.TestUserUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -118,7 +119,7 @@ public class AuthControllerJwtLoginTest
     }
 
     @Test
-    void testLoginWithEmptyPayload()
+    void testLoginWithEmptyPayload() throws Exception
     {
         // Create empty JSON payload
         HttpHeaders headers = new HttpHeaders();
@@ -133,9 +134,12 @@ public class AuthControllerJwtLoginTest
                 String.class
         );
 
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, String> responseBodyMap = objectMapper.readValue(response.getBody(), Map.class);
+
         // Assert 400 Bad Request
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Username and Password must not be null or blank", response.getBody());
+        assertEquals("Username and Password must not be null or blank", responseBodyMap.get("error"));
     }
 
     @Test
