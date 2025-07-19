@@ -48,8 +48,8 @@ public class AuthService {
 
         User user = new User();
         user.setId(UUID.randomUUID().toString());
-        user.setUsername(request.getUserName());
-        user.setEmail(request.getEmail());
+        user.setUsername(request.getUserName().toLowerCase());
+        user.setEmail(request.getEmail().toLowerCase());
         user.setFullName(request.getFullName());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
 
