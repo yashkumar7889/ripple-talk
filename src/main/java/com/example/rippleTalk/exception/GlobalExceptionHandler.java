@@ -1,11 +1,13 @@
 package com.example.rippleTalk.exception;
 
+import com.example.rippleTalk.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -36,6 +38,17 @@ public class GlobalExceptionHandler {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<ErrorResponse> handleRateLimitExceeded(RateLimitExceededException ex) {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.TOO_MANY_REQUESTS.value(),
+                "Rate limit exceeded",
+                ex.getMessage(),
+                Instant.now().toString()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.TOO_MANY_REQUESTS);
     }
 
     // Fallback for catching exception
