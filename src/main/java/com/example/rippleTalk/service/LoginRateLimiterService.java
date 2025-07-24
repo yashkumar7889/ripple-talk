@@ -29,7 +29,7 @@ public class LoginRateLimiterService
                 Bucket.builder()
                         .addLimit(Bandwidth.classic(
                                 maxUserLoginAttemptsPerMinute,
-                                Refill.greedy(maxUserLoginAttemptsPerMinute, Duration.ofMinutes(1))
+                                Refill.intervally(maxUserLoginAttemptsPerMinute, Duration.ofMinutes(1))
                         ))
                         .build()
         );

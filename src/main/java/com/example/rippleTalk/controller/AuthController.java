@@ -41,7 +41,13 @@ public class AuthController
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest servletRequest) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletRequest servletRequest)
+    {
+        if (request.getUserName() == null || request.getUserName().isBlank() ||
+                request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new BadRequestException("Username and Password must not be null or blank");
+        }
+        
         String userKey = request.getUserName();
         String clientIp = extractClientIp(servletRequest);
 
@@ -54,10 +60,6 @@ public class AuthController
             throw new RateLimitExceededException("Too many login attempts from IP: " + clientIp);
         }
 
-        if (request.getUserName() == null || request.getUserName().isBlank() ||
-                request.getPassword() == null || request.getPassword().isBlank()) {
-            throw new BadRequestException("Username and Password must not be null or blank");
-        }
         System.out.println("Login endpoint hit");
         String token = authService.authenticate(request);
         return ResponseEntity.ok(new LoginResponse(token));
