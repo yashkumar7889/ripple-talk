@@ -51,6 +51,10 @@ public class AuthController
         String userKey = request.getUserName();
         String clientIp = extractClientIp(servletRequest);
 
+        if (rateLimiterService.isIpLimitExceeded(clientIp)) {
+            throw new RateLimitExceededException("Too many unique IPs in time window");
+        }
+
         if (!rateLimiterService.tryConsumeUser(userKey))
         {
             throw new RateLimitExceededException("Too many login attempts for user: " + userKey);

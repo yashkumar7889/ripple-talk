@@ -5,6 +5,7 @@ import com.example.rippleTalk.dto.LoginResponse;
 import com.example.rippleTalk.entity.User;
 import com.example.rippleTalk.repository.UserRepository;
 import com.example.rippleTalk.security.JwtUtils;
+import com.example.rippleTalk.service.LoginRateLimiterService;
 import com.example.rippleTalk.util.TestUserUtil;
 
 import org.junit.jupiter.api.AfterEach;
@@ -45,18 +46,22 @@ public class AuthControllerRateLimiterTest
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private LoginRateLimiterService loginRateLimiterService;
+
     @Value("${security.ratelimit.user-attempts}")
     private int loginRateLimit;
 
     private final List<String> createdTestEmails = new ArrayList<>();
 
-    final String testEmail = TestUserUtil.generateUniqueTestEmail();
-    final String testUsername = TestUserUtil.generateUniqueUsername();
+    final String testEmail = TestUserUtil.generateUniqueTestEmail().toLowerCase();
+    final String testUsername = TestUserUtil.generateUniqueUsername().toLowerCase();
     final String password = "yrehfhnkdfhfh";
 
     @BeforeEach
     void setup()
     {
+        loginRateLimiterService.clearIpLimitsForTests();
         if(!createdTestEmails.isEmpty())
         {
             userRepository.deleteByEmailIn(createdTestEmails);
@@ -64,14 +69,14 @@ public class AuthControllerRateLimiterTest
 
         User user = new User();
         user.setId(UUID.randomUUID().toString());
-        user.setEmail(testEmail.toLowerCase());
-        user.setUsername(testUsername.toLowerCase());
+        user.setEmail(testEmail);
+        user.setUsername(testUsername);
         user.setFullName("John Doe");
         user.setPasswordHash(passwordEncoder.encode(password));
         user.setStatus(User.Status.ACTIVE);
         userRepository.save(user);
 
-        createdTestEmails.add(testEmail);
+        createdTestEmails.add(testUsername);
 
     }
 
@@ -85,9 +90,8 @@ public class AuthControllerRateLimiterTest
     }
 
     @Test
-    public void testLoginRateLimiting() {
-
-        // Create the login request
+    public void testLoginRateLimiting()
+    {
         LoginRequest loginRequest = new LoginRequest();
         loginRequest.setUserName(testUsername);
         loginRequest.setPassword(password);
@@ -97,17 +101,68 @@ public class AuthControllerRateLimiterTest
                 loginRequest,
                 LoginResponse.class
         );
-        // Send requests up to the limit
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertNotNull(response.getBody().getToken());
+
         for (int i = 0; i < loginRateLimit-1; i++)
         {
             response = restTemplate.postForEntity("/api/auth/login", loginRequest, LoginResponse.class);
-            // You can assert 200 OK or whatever your actual logic returns for valid/invalid login
             assertNotEquals(HttpStatus.TOO_MANY_REQUESTS, response.getStatusCode(), "Request " + (i+1) + " was rate limited prematurely");
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            assertNotNull(response.getBody().getToken());
         }
 
         ResponseEntity<String> rateLimitResponse = restTemplate.postForEntity("/api/auth/login", loginRequest, String.class);
 
         assertEquals(HttpStatus.TOO_MANY_REQUESTS, rateLimitResponse.getStatusCode());
         assertTrue(rateLimitResponse.getBody().contains("Rate limit exceeded"));
+    }
+
+    @Test
+    public void testUniqueIpLimit()
+    {
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUserName(testUsername);
+        loginRequest.setPassword(password);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        // 1st IP
+        headers.set("X-Forwarded-For", "192.168.1.1");
+        HttpEntity<LoginRequest> entity = new HttpEntity<>(loginRequest, headers);
+        ResponseEntity<LoginResponse> response1 = restTemplate.postForEntity("/api/auth/login", entity, LoginResponse.class);
+        assertNotEquals(HttpStatus.TOO_MANY_REQUESTS, response1.getStatusCode());
+        assertEquals(HttpStatus.OK, response1.getStatusCode());
+        assertNotNull(response1.getBody().getToken());
+
+        // 2nd IP
+        headers.set("X-Forwarded-For", "192.168.1.2");
+        entity = new HttpEntity<>(loginRequest, headers);
+        ResponseEntity<LoginResponse> response2 = restTemplate.postForEntity("/api/auth/login", entity, LoginResponse.class);
+        assertNotEquals(HttpStatus.TOO_MANY_REQUESTS, response2.getStatusCode());
+        assertEquals(HttpStatus.OK, response2.getStatusCode());
+        assertNotNull(response2.getBody().getToken());
+
+        // 3rd IP — should be blocked
+        headers.set("X-Forwarded-For", "192.168.1.3");
+        entity = new HttpEntity<>(loginRequest, headers);
+        ResponseEntity<LoginResponse> response3 = restTemplate.postForEntity("/api/auth/login", entity, LoginResponse.class);
+        assertEquals(HttpStatus.TOO_MANY_REQUESTS, response3.getStatusCode());
+    }
+
+    private void createUser(String username)
+    {
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setEmail(TestUserUtil.generateUniqueTestEmail().toLowerCase());
+        user.setUsername(username);
+        user.setFullName("John Doe");
+        user.setPasswordHash(passwordEncoder.encode(password));
+        user.setStatus(User.Status.ACTIVE);
+        userRepository.save(user);
+
+        createdTestEmails.add(username);
     }
 }
