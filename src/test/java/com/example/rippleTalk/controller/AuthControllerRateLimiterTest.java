@@ -30,7 +30,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @AutoConfigureMockMvc
 @TestPropertySource(properties = {
         "security.ratelimit.user-attempts=5",
-        "security.ratelimit.ip-attempts=10"
+        "security.ratelimit.ip-attempts=10",
+        "security.ratelimit.max-unique-ips=2"
 })
 public class AuthControllerRateLimiterTest
 {
