@@ -27,6 +27,12 @@ public class LoginRateLimiterService
     @Value("${security.ratelimit.unique-ip-window-seconds}")
     private int uniqueIpWindowSeconds;
 
+    @Value("${security.ratelimit.user-refill-interval-seconds}")
+    private int userRefillIntervalSeconds;
+
+    @Value("${security.ratelimit.ip-refill-interval-seconds}")
+    private int ipRefillIntervalSeconds;
+
     private final Map<String, Instant> ipAccessTimes = new ConcurrentHashMap<>();
 
     // Maps to store buckets for each user and IP address
@@ -38,7 +44,7 @@ public class LoginRateLimiterService
                 Bucket.builder()
                         .addLimit(Bandwidth.classic(
                                 maxUserLoginAttemptsPerMinute,
-                                Refill.intervally(maxUserLoginAttemptsPerMinute, Duration.ofMinutes(1))
+                                Refill.intervally(maxUserLoginAttemptsPerMinute, Duration.ofSeconds(userRefillIntervalSeconds))
                         ))
                         .build()
         );
@@ -50,7 +56,7 @@ public class LoginRateLimiterService
                 Bucket.builder()
                         .addLimit(Bandwidth.classic(
                                 maxIpLoginAttemptsPerMinute,
-                                Refill.greedy(maxIpLoginAttemptsPerMinute, Duration.ofSeconds(60))
+                                Refill.greedy(maxIpLoginAttemptsPerMinute, Duration.ofSeconds(ipRefillIntervalSeconds))
                         ))
                         .build()
         );
