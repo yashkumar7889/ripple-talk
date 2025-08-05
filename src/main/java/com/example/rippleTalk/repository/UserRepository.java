@@ -24,6 +24,8 @@ public interface UserRepository extends JpaRepository<User, UUID>
     @Query("SELECT u FROM User u WHERE LOWER(u.username) = LOWER(:username) OR LOWER(u.email) = LOWER(:email)")
     Optional<User> findByUsernameOrEmailIgnoreCase(@Param("username") String username, @Param("email") String email);
 
+    Optional<User> findByUsername(String username);
+
     @Modifying
     @Transactional
     @Query("DELETE FROM User u WHERE u.email = :email")
@@ -33,6 +35,16 @@ public interface UserRepository extends JpaRepository<User, UUID>
     @Transactional
     @Query("DELETE FROM User u WHERE u.email IN :emails")
     void deleteByEmailIn(@Param("emails") List<String> emails);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM User u WHERE u.username = :username")
+    void deleteByUsername(@Param("username") String username);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM User u WHERE u.username IN :usernames")
+    void deleteByUsernameIn(@Param("usernames") List<String> username);
 
     @Modifying
     @Transactional
