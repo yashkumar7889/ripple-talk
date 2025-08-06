@@ -1,6 +1,7 @@
 package com.example.rippleTalk.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -9,8 +10,10 @@ import java.time.Duration;
 @Service
 public class TypingIndicatorService
 {
+    @Value("${spring.redis.time-to-live}")
+    private long timeToLiveInSeconds;
+
     private final RedisTemplate<String, Object> redisTemplate;
-    private static final Duration TTL = Duration.ofSeconds(5);
 
     @Autowired
     public TypingIndicatorService(RedisTemplate<String, Object> redisTemplate) {
@@ -19,9 +22,10 @@ public class TypingIndicatorService
 
     public void updateTypingStatus(String conversationId, String userId, Boolean isTyping) {
         String key = buildRedisKey(conversationId, userId);
+        final Duration ttl = Duration.ofSeconds(timeToLiveInSeconds);
 
         if (isTyping) {
-            redisTemplate.opsForValue().set(key, true, TTL);
+            redisTemplate.opsForValue().set(key, true, ttl);
         } else {
             redisTemplate.delete(key);
         }
