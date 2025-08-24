@@ -1,5 +1,6 @@
 package com.example.rippleTalk.controller;
 
+import com.example.rippleTalk.dto.AcceptConversationRequest;
 import com.example.rippleTalk.dto.ConversationRequestDto;
 import com.example.rippleTalk.dto.ConversationRequestResponseDto;
 import com.example.rippleTalk.service.ConversationService;
@@ -21,5 +22,11 @@ public class ConversationRequestController
     public ResponseEntity<ConversationRequestResponseDto> sendRequest(
             @RequestBody ConversationRequestDto dto) {
         return ResponseEntity.ok(conversationService.sendRequest(dto));
+    }
+
+    @PostMapping("/request/respond")
+    public ResponseEntity<ConversationRequestResponseDto> respondToRequest(
+            @RequestBody AcceptConversationRequest dto) {
+        return ResponseEntity.ok(conversationService.respondToRequest(dto));
     }
 }

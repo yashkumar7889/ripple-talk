@@ -8,5 +8,5 @@ import lombok.Setter;
 public class AcceptConversationRequest
 {
     private String requestId;
-    private boolean isAccepted;
+    private Boolean isAccepted;
 }

@@ -51,6 +51,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.TOO_MANY_REQUESTS);
     }
 
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflictException(ConflictException ex)
+    {
+        ErrorResponse errorResponse = new ErrorResponse(
+                HttpStatus.CONFLICT.value(),
+                "RESOURCE_STATE_CONFLICT",
+                ex.getMessage(),
+                Instant.now().toString()
+        );
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
     // Fallback for catching exception
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Object> handleGeneric(Exception ex)
