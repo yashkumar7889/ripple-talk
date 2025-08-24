@@ -78,6 +78,15 @@ ALTER TABLE presence
 DROP COLUMN is_online,
 MODIFY last_seen TIMESTAMP NULL DEFAULT NULL;
 
+CREATE TABLE conversation_requests (
+    request_id CHAR(36) PRIMARY KEY,
+    sender_id VARCHAR(50) REFERENCES users(user_id),
+    receiver_id VARCHAR(50) REFERENCES users(user_id),
+    status ENUM('PENDING','ACCEPTED','REJECTED') DEFAULT 'PENDING',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 ---- NOTIFICATIONS TABLE
 --CREATE TABLE notifications (
 --    id UUID PRIMARY KEY,

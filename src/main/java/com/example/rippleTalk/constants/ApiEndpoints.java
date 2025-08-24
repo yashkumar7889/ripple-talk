@@ -12,10 +12,12 @@ public final class ApiEndpoints {
     public static final String REGISTER = AUTH_BASE + "/register";
     public static final String LOGIN = AUTH_BASE + "/login";
     public static final String TYPING = TYPING_BASE;
+    public static final String WEBSOCKET = "/ws/**";
 
     public static final String[] PUBLIC_ENDPOINTS = {
             REGISTER,
             LOGIN,
-            TYPING
+            TYPING,
+            WEBSOCKET
     };
 }
