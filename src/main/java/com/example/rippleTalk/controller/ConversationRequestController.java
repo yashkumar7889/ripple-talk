@@ -4,6 +4,7 @@ import com.example.rippleTalk.dto.AcceptConversationRequest;
 import com.example.rippleTalk.dto.ConversationRequestDto;
 import com.example.rippleTalk.dto.ConversationRequestResponseDto;
 import com.example.rippleTalk.service.ConversationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,13 +21,14 @@ public class ConversationRequestController
 
     @PostMapping("/request")
     public ResponseEntity<ConversationRequestResponseDto> sendRequest(
-            @RequestBody ConversationRequestDto dto) {
+           @Valid @RequestBody ConversationRequestDto dto) {
         return ResponseEntity.ok(conversationService.sendRequest(dto));
     }
 
     @PostMapping("/request/respond")
     public ResponseEntity<ConversationRequestResponseDto> respondToRequest(
-            @RequestBody AcceptConversationRequest dto) {
+           @Valid @RequestBody AcceptConversationRequest dto) {
+
         return ResponseEntity.ok(conversationService.respondToRequest(dto));
     }
 }

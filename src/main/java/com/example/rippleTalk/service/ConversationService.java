@@ -9,6 +9,7 @@ import com.example.rippleTalk.entity.Conversation;
 import com.example.rippleTalk.entity.ConversationParticipant;
 import com.example.rippleTalk.entity.ConversationRequest;
 import com.example.rippleTalk.exception.ConflictException;
+import com.example.rippleTalk.exception.ResourceNotFoundException;
 import com.example.rippleTalk.repository.ConversationParticipantRepository;
 import com.example.rippleTalk.repository.ConversationRepository;
 import com.example.rippleTalk.repository.ConversationRequestRepository;
@@ -50,7 +51,7 @@ public class ConversationService
     @Transactional
     public ConversationRequestResponseDto respondToRequest(AcceptConversationRequest acceptConversationRequest) {
 
-        ConversationRequest conversationRequest = requestRepository.findById(acceptConversationRequest.getRequestId()).orElseThrow(() -> new RuntimeException("Request does not exist"));
+        ConversationRequest conversationRequest = requestRepository.findById(acceptConversationRequest.getRequestId()).orElseThrow(() -> new ResourceNotFoundException("Request does not exist"));
 
         if (conversationRequest.getStatus() != RequestStatus.PENDING) {
             throw new ConflictException("This request has already been " + conversationRequest.getStatus());
