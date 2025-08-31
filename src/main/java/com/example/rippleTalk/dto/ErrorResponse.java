@@ -1,18 +1,17 @@
 package com.example.rippleTalk.dto;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Data
 @Getter
 @Setter
+@NoArgsConstructor
 public class ErrorResponse
 {
-    private final int status;
-    private final String error;
-    private final String message;
-    private final String timestamp;
+    private int status;
+    private  String error;
+    private  String message;
+    private  String timestamp;
 
     public ErrorResponse(int status, String error, String message, String timestamp)
     {

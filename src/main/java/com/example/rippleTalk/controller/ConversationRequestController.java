@@ -51,8 +51,8 @@ public class ConversationRequestController
 
     private List<String> getMissingUsers(List<String> userIds)
     {
-        Optional<User> users = userRepository.findByUsernameInOrEmailInIgnoreCase(userIds);
-        Set<String> foundUserIds = users.stream().map(User::getId).collect(Collectors.toSet());
+        List<User> users = userRepository.findByUsernameInOrEmailInIgnoreCase(userIds);
+        Set<String> foundUserIds = users.stream().map(User::getUsername).collect(Collectors.toSet());
         return userIds.stream()
                 .filter(id -> !foundUserIds.contains(id)).toList();
     }

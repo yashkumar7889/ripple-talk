@@ -25,7 +25,7 @@ public interface UserRepository extends JpaRepository<User, UUID>
     Optional<User> findByUsernameOrEmailIgnoreCase(@Param("username") String username, @Param("email") String email);
 
     @Query("SELECT u FROM User u WHERE LOWER(u.username) IN (:usernames) OR LOWER(u.email) IN (:usernames)")
-    Optional<User> findByUsernameInOrEmailInIgnoreCase(@Param("usernames") List<String> usernames);
+    List<User> findByUsernameInOrEmailInIgnoreCase(@Param("usernames") List<String> usernames);
 
     Optional<User> findByUsername(String username);
 
