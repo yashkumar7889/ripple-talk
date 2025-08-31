@@ -65,49 +65,23 @@ public class ConversationRequestTest
         final String username2 = user2.getUsername();
         createdTestEmails.add(username2);
 
-        LoginRequest loginRequest1 = new LoginRequest();
-        loginRequest1.setUserName(username1);
-        loginRequest1.setPassword(password);
+        LoginRequest loginRequest1 = createLoginRequest(username1, password);
+        ResponseEntity<LoginResponse> response1 = sendPostRequest("/api/auth/login", loginRequest1, LoginResponse.class);
 
-        LoginRequest loginRequest2 = new LoginRequest();
-        loginRequest2.setUserName(username2);
-        loginRequest2.setPassword(password);
-
-        ResponseEntity<LoginResponse> response1 = restTemplate.postForEntity(
-                "/api/auth/login",
-                loginRequest1,
-                LoginResponse.class
-        );
-
-        ResponseEntity<LoginResponse> response2 = restTemplate.postForEntity(
-                "/api/auth/login",
-                loginRequest2,
-                LoginResponse.class
-        );
+        LoginRequest loginRequest2 = createLoginRequest(username2, password);
+        ResponseEntity<LoginResponse> response2 = sendPostRequest("/api/auth/login", loginRequest2, LoginResponse.class);
 
         String token1 = response1.getBody().getToken();
         String token2 = response2.getBody().getToken();
 
-        System.out.println("Hel");
-
-        ConversationRequestDto conversationRequestDto = new ConversationRequestDto();
-        conversationRequestDto.setSenderId(username1);
-        conversationRequestDto.setReceiverId(username2);
-        conversationRequestDto.setStatus(RequestStatus.PENDING);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(token1);
+        ConversationRequestDto conversationRequestDto = createConversationRequest(username1, username2, RequestStatus.PENDING);
+        HttpHeaders headers = createHttpHeaders(MediaType.APPLICATION_JSON, token1);
 
         HttpEntity<ConversationRequestDto> requestEntity =
                 new HttpEntity<>(conversationRequestDto, headers);
 
         String url = restTemplate.getRootUri() + "/api/conversation/request";
-
-        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = restTemplate.postForEntity(
-                url,
-                requestEntity,
-                ConversationRequestResponseDto.class);
+        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = sendPostRequest(url, requestEntity, ConversationRequestResponseDto.class);
 
         Assert.assertEquals("senderIds are not equal", conversationRequestDto.getSenderId(), conversationRequestResponse.getBody().getSenderId());
         Assert.assertEquals("receiverIds are not equal", conversationRequestDto.getReceiverId(), conversationRequestResponse.getBody().getReceiverId());
@@ -125,57 +99,29 @@ public class ConversationRequestTest
         final String username2 = user2.getUsername();
         createdTestEmails.add(username2);
 
-        LoginRequest loginRequest1 = new LoginRequest();
-        loginRequest1.setUserName(username1);
-        loginRequest1.setPassword(password);
+        LoginRequest loginRequest1 = createLoginRequest(username1, password);
+        ResponseEntity<LoginResponse> response1 = sendPostRequest("/api/auth/login", loginRequest1, LoginResponse.class);
 
-        LoginRequest loginRequest2 = new LoginRequest();
-        loginRequest2.setUserName(username2);
-        loginRequest2.setPassword(password);
-
-        ResponseEntity<LoginResponse> response1 = restTemplate.postForEntity(
-                "/api/auth/login",
-                loginRequest1,
-                LoginResponse.class
-        );
-
-        ResponseEntity<LoginResponse> response2 = restTemplate.postForEntity(
-                "/api/auth/login",
-                loginRequest2,
-                LoginResponse.class
-        );
+        LoginRequest loginRequest2 = createLoginRequest(username2, password);
+        ResponseEntity<LoginResponse> response2 = sendPostRequest("/api/auth/login", loginRequest2, LoginResponse.class);
 
         String token1 = response1.getBody().getToken();
         String token2 = response2.getBody().getToken();
 
-        System.out.println("Hel");
-
-        ConversationRequestDto conversationRequestDto = new ConversationRequestDto();
-        conversationRequestDto.setSenderId(username1);
-        conversationRequestDto.setReceiverId(username2);
-        conversationRequestDto.setStatus(RequestStatus.PENDING);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(token1);
+        ConversationRequestDto conversationRequestDto = createConversationRequest(username1, username2, RequestStatus.PENDING);
+        HttpHeaders headers = createHttpHeaders(MediaType.APPLICATION_JSON, token1);
 
         HttpEntity<ConversationRequestDto> requestEntity =
                 new HttpEntity<>(conversationRequestDto, headers);
 
         String url = restTemplate.getRootUri() + "/api/conversation/request";
-
-        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = restTemplate.postForEntity(
-                url,
-                requestEntity,
-                ConversationRequestResponseDto.class);
+        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = sendPostRequest(url, requestEntity, ConversationRequestResponseDto.class);
 
         Assert.assertEquals("senderIds are not equal", conversationRequestDto.getSenderId(), conversationRequestResponse.getBody().getSenderId());
         Assert.assertEquals("receiverIds are not equal", conversationRequestDto.getReceiverId(), conversationRequestResponse.getBody().getReceiverId());
         Assert.assertEquals("conversation request status are not equal",conversationRequestDto.getStatus().toString(), conversationRequestResponse.getBody().getStatus());
 
-        AcceptConversationRequest acceptConversationRequest = new AcceptConversationRequest();
-        acceptConversationRequest.setRequestId(conversationRequestResponse.getBody().getRequestId());
-        acceptConversationRequest.setIsAccepted(true);
+        AcceptConversationRequest acceptConversationRequest = createAcceptConversationRequest(conversationRequestResponse.getBody().getRequestId(), true);
 
         headers.setBearerAuth(token2);
 
@@ -183,11 +129,7 @@ public class ConversationRequestTest
                 new HttpEntity<>(acceptConversationRequest, headers);
 
         String acceptConversationRequestUrl = restTemplate.getRootUri() + "/api/conversation/request/respond";
-
-        ResponseEntity<ConversationRequestResponseDto> acceptRequestResponse = restTemplate.postForEntity(
-                acceptConversationRequestUrl,
-                acceptConversationRequestHttpEntity,
-                ConversationRequestResponseDto.class);
+        ResponseEntity<ConversationRequestResponseDto> acceptRequestResponse = sendPostRequest(acceptConversationRequestUrl, acceptConversationRequestHttpEntity, ConversationRequestResponseDto.class);
 
         Assert.assertEquals("Post accepting request senderIds are not equal", conversationRequestDto.getSenderId(), acceptRequestResponse.getBody().getSenderId());
         Assert.assertEquals("Post accepting request receiverIds are not equal", conversationRequestDto.getReceiverId(), acceptRequestResponse.getBody().getReceiverId());
@@ -205,57 +147,29 @@ public class ConversationRequestTest
         final String username2 = user2.getUsername();
         createdTestEmails.add(username2);
 
-        LoginRequest loginRequest1 = new LoginRequest();
-        loginRequest1.setUserName(username1);
-        loginRequest1.setPassword(password);
+        LoginRequest loginRequest1 = createLoginRequest(username1, password);
+        ResponseEntity<LoginResponse> response1 = sendPostRequest("/api/auth/login", loginRequest1, LoginResponse.class);
 
-        LoginRequest loginRequest2 = new LoginRequest();
-        loginRequest2.setUserName(username2);
-        loginRequest2.setPassword(password);
-
-        ResponseEntity<LoginResponse> response1 = restTemplate.postForEntity(
-                "/api/auth/login",
-                loginRequest1,
-                LoginResponse.class
-        );
-
-        ResponseEntity<LoginResponse> response2 = restTemplate.postForEntity(
-                "/api/auth/login",
-                loginRequest2,
-                LoginResponse.class
-        );
+        LoginRequest loginRequest2 = createLoginRequest(username2, password);
+        ResponseEntity<LoginResponse> response2 = sendPostRequest("/api/auth/login", loginRequest2, LoginResponse.class);
 
         String token1 = response1.getBody().getToken();
         String token2 = response2.getBody().getToken();
 
-        System.out.println("Hel");
-
-        ConversationRequestDto conversationRequestDto = new ConversationRequestDto();
-        conversationRequestDto.setSenderId(username1);
-        conversationRequestDto.setReceiverId(username2);
-        conversationRequestDto.setStatus(RequestStatus.PENDING);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(token1);
+        ConversationRequestDto conversationRequestDto = createConversationRequest(username1, username2, RequestStatus.PENDING);
+        HttpHeaders headers = createHttpHeaders(MediaType.APPLICATION_JSON, token1);
 
         HttpEntity<ConversationRequestDto> requestEntity =
                 new HttpEntity<>(conversationRequestDto, headers);
 
         String url = restTemplate.getRootUri() + "/api/conversation/request";
-
-        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = restTemplate.postForEntity(
-                url,
-                requestEntity,
-                ConversationRequestResponseDto.class);
+        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = sendPostRequest(url, requestEntity, ConversationRequestResponseDto.class);
 
         Assert.assertEquals("senderIds are not equal", conversationRequestDto.getSenderId(), conversationRequestResponse.getBody().getSenderId());
         Assert.assertEquals("receiverIds are not equal", conversationRequestDto.getReceiverId(), conversationRequestResponse.getBody().getReceiverId());
         Assert.assertEquals("conversation request status are not equal",conversationRequestDto.getStatus().toString(), conversationRequestResponse.getBody().getStatus());
 
-        AcceptConversationRequest acceptConversationRequest = new AcceptConversationRequest();
-        acceptConversationRequest.setRequestId(conversationRequestResponse.getBody().getRequestId());
-        acceptConversationRequest.setIsAccepted(false);
+        AcceptConversationRequest acceptConversationRequest = createAcceptConversationRequest(conversationRequestResponse.getBody().getRequestId(), false);
 
         headers.setBearerAuth(token2);
 
@@ -263,11 +177,7 @@ public class ConversationRequestTest
                 new HttpEntity<>(acceptConversationRequest, headers);
 
         String acceptConversationRequestUrl = restTemplate.getRootUri() + "/api/conversation/request/respond";
-
-        ResponseEntity<ConversationRequestResponseDto> acceptRequestResponse = restTemplate.postForEntity(
-                acceptConversationRequestUrl,
-                acceptConversationRequestHttpEntity,
-                ConversationRequestResponseDto.class);
+        ResponseEntity<ConversationRequestResponseDto> acceptRequestResponse =sendPostRequest(acceptConversationRequestUrl, acceptConversationRequestHttpEntity, ConversationRequestResponseDto.class);
 
         Assert.assertEquals("Post rejecting request senderIds are not equal", conversationRequestDto.getSenderId(), acceptRequestResponse.getBody().getSenderId());
         Assert.assertEquals("Post rejecting request receiverIds are not equal", conversationRequestDto.getReceiverId(), acceptRequestResponse.getBody().getReceiverId());
@@ -284,57 +194,29 @@ public class ConversationRequestTest
         final String username2 = user2.getUsername();
         createdTestEmails.add(username2);
 
-        LoginRequest loginRequest1 = new LoginRequest();
-        loginRequest1.setUserName(username1);
-        loginRequest1.setPassword(password);
+        LoginRequest loginRequest1 = createLoginRequest(username1, password);
+        ResponseEntity<LoginResponse> response1 = sendPostRequest("/api/auth/login", loginRequest1, LoginResponse.class);
 
-        LoginRequest loginRequest2 = new LoginRequest();
-        loginRequest2.setUserName(username2);
-        loginRequest2.setPassword(password);
-
-        ResponseEntity<LoginResponse> response1 = restTemplate.postForEntity(
-                "/api/auth/login",
-                loginRequest1,
-                LoginResponse.class
-        );
-
-        ResponseEntity<LoginResponse> response2 = restTemplate.postForEntity(
-                "/api/auth/login",
-                loginRequest2,
-                LoginResponse.class
-        );
+        LoginRequest loginRequest2 = createLoginRequest(username2, password);
+        ResponseEntity<LoginResponse> response2 = sendPostRequest("/api/auth/login", loginRequest2, LoginResponse.class);
 
         String token1 = response1.getBody().getToken();
         String token2 = response2.getBody().getToken();
 
-        System.out.println("Hel");
-
-        ConversationRequestDto conversationRequestDto = new ConversationRequestDto();
-        conversationRequestDto.setSenderId(username1);
-        conversationRequestDto.setReceiverId(username2);
-        conversationRequestDto.setStatus(RequestStatus.PENDING);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(token1);
+        ConversationRequestDto conversationRequestDto = createConversationRequest(username1, username2, RequestStatus.PENDING);
+        HttpHeaders headers = createHttpHeaders(MediaType.APPLICATION_JSON, token1);
 
         HttpEntity<ConversationRequestDto> requestEntity =
                 new HttpEntity<>(conversationRequestDto, headers);
 
         String url = restTemplate.getRootUri() + "/api/conversation/request";
-
-        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = restTemplate.postForEntity(
-                url,
-                requestEntity,
-                ConversationRequestResponseDto.class);
+        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = sendPostRequest(url, requestEntity, ConversationRequestResponseDto.class);
 
         Assert.assertEquals("senderIds are not equal", conversationRequestDto.getSenderId(), conversationRequestResponse.getBody().getSenderId());
         Assert.assertEquals("receiverIds are not equal", conversationRequestDto.getReceiverId(), conversationRequestResponse.getBody().getReceiverId());
         Assert.assertEquals("conversation request status are not equal",conversationRequestDto.getStatus().toString(), conversationRequestResponse.getBody().getStatus());
 
-        AcceptConversationRequest rejectConversationRequest = new AcceptConversationRequest();
-        rejectConversationRequest.setRequestId(conversationRequestResponse.getBody().getRequestId());
-        rejectConversationRequest.setIsAccepted(false);
+        AcceptConversationRequest rejectConversationRequest = createAcceptConversationRequest(conversationRequestResponse.getBody().getRequestId(), false);
 
         headers.setBearerAuth(token2);
 
@@ -342,20 +224,13 @@ public class ConversationRequestTest
                 new HttpEntity<>(rejectConversationRequest, headers);
 
         String acceptConversationRequestUrl = restTemplate.getRootUri() + "/api/conversation/request/respond";
-
-        ResponseEntity<ConversationRequestResponseDto> acceptRequestResponse = restTemplate.postForEntity(
-                acceptConversationRequestUrl,
-                acceptConversationRequestHttpEntity,
-                ConversationRequestResponseDto.class);
+        ResponseEntity<ConversationRequestResponseDto> acceptRequestResponse = sendPostRequest(acceptConversationRequestUrl, acceptConversationRequestHttpEntity, ConversationRequestResponseDto.class);
 
         Assert.assertEquals("Post rejecting request senderIds are not equal", conversationRequestDto.getSenderId(), acceptRequestResponse.getBody().getSenderId());
         Assert.assertEquals("Post rejecting request receiverIds are not equal", conversationRequestDto.getReceiverId(), acceptRequestResponse.getBody().getReceiverId());
         Assert.assertEquals("Post rejecting request status are not equal",RequestStatus.REJECTED.toString(), acceptRequestResponse.getBody().getStatus());
 
-        ResponseEntity<String> rejectRequestResponse2 = restTemplate.postForEntity(
-                acceptConversationRequestUrl,
-                acceptConversationRequestHttpEntity,
-                String.class);
+        ResponseEntity<String> rejectRequestResponse2 = sendPostRequest(acceptConversationRequestUrl, acceptConversationRequestHttpEntity, String.class);
 
         ObjectMapper mapper = new ObjectMapper();
         ErrorResponse errorResponse = mapper.readValue(rejectRequestResponse2.getBody(), ErrorResponse.class);
@@ -373,57 +248,29 @@ public class ConversationRequestTest
         final String username2 = user2.getUsername();
         createdTestEmails.add(username2);
 
-        LoginRequest loginRequest1 = new LoginRequest();
-        loginRequest1.setUserName(username1);
-        loginRequest1.setPassword(password);
+        LoginRequest loginRequest1 = createLoginRequest(username1, password);
+        ResponseEntity<LoginResponse> response1 = sendPostRequest("/api/auth/login", loginRequest1, LoginResponse.class);
 
-        LoginRequest loginRequest2 = new LoginRequest();
-        loginRequest2.setUserName(username2);
-        loginRequest2.setPassword(password);
-
-        ResponseEntity<LoginResponse> response1 = restTemplate.postForEntity(
-                "/api/auth/login",
-                loginRequest1,
-                LoginResponse.class
-        );
-
-        ResponseEntity<LoginResponse> response2 = restTemplate.postForEntity(
-                "/api/auth/login",
-                loginRequest2,
-                LoginResponse.class
-        );
+        LoginRequest loginRequest2 = createLoginRequest(username2, password);
+        ResponseEntity<LoginResponse> response2 = sendPostRequest("/api/auth/login", loginRequest2, LoginResponse.class);
 
         String token1 = response1.getBody().getToken();
         String token2 = response2.getBody().getToken();
 
-        System.out.println("Hel");
-
-        ConversationRequestDto conversationRequestDto = new ConversationRequestDto();
-        conversationRequestDto.setSenderId(username1);
-        conversationRequestDto.setReceiverId(username2);
-        conversationRequestDto.setStatus(RequestStatus.PENDING);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(token1);
+        ConversationRequestDto conversationRequestDto = createConversationRequest(username1, username2, RequestStatus.PENDING);
+        HttpHeaders headers = createHttpHeaders(MediaType.APPLICATION_JSON, token1);
 
         HttpEntity<ConversationRequestDto> requestEntity =
                 new HttpEntity<>(conversationRequestDto, headers);
 
         String url = restTemplate.getRootUri() + "/api/conversation/request";
-
-        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = restTemplate.postForEntity(
-                url,
-                requestEntity,
-                ConversationRequestResponseDto.class);
+        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = sendPostRequest(url, requestEntity, ConversationRequestResponseDto.class);
 
         Assert.assertEquals("senderIds are not equal", conversationRequestDto.getSenderId(), conversationRequestResponse.getBody().getSenderId());
         Assert.assertEquals("receiverIds are not equal", conversationRequestDto.getReceiverId(), conversationRequestResponse.getBody().getReceiverId());
         Assert.assertEquals("conversation request status are not equal",conversationRequestDto.getStatus().toString(), conversationRequestResponse.getBody().getStatus());
 
-        AcceptConversationRequest rejectConversationRequest = new AcceptConversationRequest();
-        rejectConversationRequest.setRequestId(conversationRequestResponse.getBody().getRequestId());
-        rejectConversationRequest.setIsAccepted(false);
+        AcceptConversationRequest rejectConversationRequest = createAcceptConversationRequest(conversationRequestResponse.getBody().getRequestId(), false);
 
         headers.setBearerAuth(token2);
 
@@ -432,29 +279,19 @@ public class ConversationRequestTest
 
         String acceptConversationRequestUrl = restTemplate.getRootUri() + "/api/conversation/request/respond";
 
-        ResponseEntity<ConversationRequestResponseDto> acceptRequestResponse = restTemplate.postForEntity(
-                acceptConversationRequestUrl,
-                acceptConversationRequestHttpEntity,
-                ConversationRequestResponseDto.class);
+        ResponseEntity<ConversationRequestResponseDto> acceptRequestResponse = sendPostRequest(acceptConversationRequestUrl, acceptConversationRequestHttpEntity, ConversationRequestResponseDto.class);
 
         Assert.assertEquals("Post rejecting request senderIds are not equal", conversationRequestDto.getSenderId(), acceptRequestResponse.getBody().getSenderId());
         Assert.assertEquals("Post rejecting request receiverIds are not equal", conversationRequestDto.getReceiverId(), acceptRequestResponse.getBody().getReceiverId());
         Assert.assertEquals("Post rejecting request status are not equal",RequestStatus.REJECTED.toString(), acceptRequestResponse.getBody().getStatus());
 
-        AcceptConversationRequest acceptConversationRequest = new AcceptConversationRequest();
-        acceptConversationRequest.setRequestId(conversationRequestResponse.getBody().getRequestId());
-        acceptConversationRequest.setIsAccepted(true);
+        AcceptConversationRequest acceptConversationRequest = createAcceptConversationRequest(conversationRequestResponse.getBody().getRequestId(), true);
 
         headers.setBearerAuth(token2);
 
         HttpEntity<AcceptConversationRequest> acceptConversationRequestHttpEntity2 =
                 new HttpEntity<>(acceptConversationRequest, headers);
-
-
-        ResponseEntity<String> rejectRequestResponse2 = restTemplate.postForEntity(
-                acceptConversationRequestUrl,
-                acceptConversationRequestHttpEntity2,
-                String.class);
+        ResponseEntity<String> rejectRequestResponse2 = sendPostRequest(acceptConversationRequestUrl, acceptConversationRequestHttpEntity2, String.class);
 
         ObjectMapper mapper = new ObjectMapper();
         ErrorResponse errorResponse = mapper.readValue(rejectRequestResponse2.getBody(), ErrorResponse.class);
@@ -462,7 +299,7 @@ public class ConversationRequestTest
         Assert.assertNotNull(errorResponse.getMessage());
     }
 
-    public  User createUser()
+    private  User createUser()
     {
         User user = new User();
         user.setId(UUID.randomUUID().toString());
@@ -472,5 +309,50 @@ public class ConversationRequestTest
         user.setPasswordHash(passwordEncoder.encode(password));
         user.setStatus(User.Status.ACTIVE);
         return userRepository.save(user);
+    }
+
+    private ConversationRequestDto createConversationRequest(final String senderId, final String receiverId, final RequestStatus requestStatus)
+    {
+        ConversationRequestDto conversationRequestDto = new ConversationRequestDto();
+        conversationRequestDto.setSenderId(senderId);
+        conversationRequestDto.setReceiverId(receiverId);
+        conversationRequestDto.setStatus(requestStatus);
+
+        return conversationRequestDto;
+    }
+
+    private LoginRequest createLoginRequest(final String username, final String password)
+    {
+        LoginRequest loginRequest = new LoginRequest();
+        loginRequest.setUserName(username);
+        loginRequest.setPassword(password);
+
+        return loginRequest;
+    }
+
+    private HttpHeaders createHttpHeaders(final MediaType mediaType, final String token)
+    {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
+
+        return headers;
+    }
+
+    private <T>ResponseEntity<T> sendPostRequest(String url, Object request, Class<T> responseType)
+    {
+       return restTemplate.postForEntity(
+                url,
+                request,
+                responseType);
+    }
+
+    private AcceptConversationRequest createAcceptConversationRequest(final String requestId, final boolean isAccepted)
+    {
+        AcceptConversationRequest acceptConversationRequest = new AcceptConversationRequest();
+        acceptConversationRequest.setRequestId(requestId);
+        acceptConversationRequest.setIsAccepted(isAccepted);
+
+        return acceptConversationRequest;
     }
 }
