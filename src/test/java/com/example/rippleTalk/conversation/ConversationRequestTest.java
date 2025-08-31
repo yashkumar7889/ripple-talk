@@ -66,10 +66,10 @@ public class ConversationRequestTest
         createdTestEmails.add(username2);
 
         LoginRequest loginRequest1 = createLoginRequest(username1, password);
-        ResponseEntity<LoginResponse> response1 = sendPostRequest("/api/auth/login", loginRequest1, LoginResponse.class);
+        ResponseEntity<LoginResponse> response1 = sendPostRequest(getLoginURL(), loginRequest1, LoginResponse.class);
 
         LoginRequest loginRequest2 = createLoginRequest(username2, password);
-        ResponseEntity<LoginResponse> response2 = sendPostRequest("/api/auth/login", loginRequest2, LoginResponse.class);
+        ResponseEntity<LoginResponse> response2 = sendPostRequest(getLoginURL(), loginRequest2, LoginResponse.class);
 
         String token1 = response1.getBody().getToken();
         String token2 = response2.getBody().getToken();
@@ -80,8 +80,7 @@ public class ConversationRequestTest
         HttpEntity<ConversationRequestDto> requestEntity =
                 new HttpEntity<>(conversationRequestDto, headers);
 
-        String url = restTemplate.getRootUri() + "/api/conversation/request";
-        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = sendPostRequest(url, requestEntity, ConversationRequestResponseDto.class);
+        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = sendPostRequest(getConversationRequestURL(), requestEntity, ConversationRequestResponseDto.class);
 
         Assert.assertEquals("senderIds are not equal", conversationRequestDto.getSenderId(), conversationRequestResponse.getBody().getSenderId());
         Assert.assertEquals("receiverIds are not equal", conversationRequestDto.getReceiverId(), conversationRequestResponse.getBody().getReceiverId());
@@ -100,10 +99,10 @@ public class ConversationRequestTest
         createdTestEmails.add(username2);
 
         LoginRequest loginRequest1 = createLoginRequest(username1, password);
-        ResponseEntity<LoginResponse> response1 = sendPostRequest("/api/auth/login", loginRequest1, LoginResponse.class);
+        ResponseEntity<LoginResponse> response1 = sendPostRequest(getLoginURL(), loginRequest1, LoginResponse.class);
 
         LoginRequest loginRequest2 = createLoginRequest(username2, password);
-        ResponseEntity<LoginResponse> response2 = sendPostRequest("/api/auth/login", loginRequest2, LoginResponse.class);
+        ResponseEntity<LoginResponse> response2 = sendPostRequest(getLoginURL(), loginRequest2, LoginResponse.class);
 
         String token1 = response1.getBody().getToken();
         String token2 = response2.getBody().getToken();
@@ -114,7 +113,7 @@ public class ConversationRequestTest
         HttpEntity<ConversationRequestDto> requestEntity =
                 new HttpEntity<>(conversationRequestDto, headers);
 
-        String url = restTemplate.getRootUri() + "/api/conversation/request";
+        String url = "/api/conversation/request";
         ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = sendPostRequest(url, requestEntity, ConversationRequestResponseDto.class);
 
         Assert.assertEquals("senderIds are not equal", conversationRequestDto.getSenderId(), conversationRequestResponse.getBody().getSenderId());
@@ -148,10 +147,10 @@ public class ConversationRequestTest
         createdTestEmails.add(username2);
 
         LoginRequest loginRequest1 = createLoginRequest(username1, password);
-        ResponseEntity<LoginResponse> response1 = sendPostRequest("/api/auth/login", loginRequest1, LoginResponse.class);
+        ResponseEntity<LoginResponse> response1 = sendPostRequest(getLoginURL(), loginRequest1, LoginResponse.class);
 
         LoginRequest loginRequest2 = createLoginRequest(username2, password);
-        ResponseEntity<LoginResponse> response2 = sendPostRequest("/api/auth/login", loginRequest2, LoginResponse.class);
+        ResponseEntity<LoginResponse> response2 = sendPostRequest(getLoginURL(), loginRequest2, LoginResponse.class);
 
         String token1 = response1.getBody().getToken();
         String token2 = response2.getBody().getToken();
@@ -162,8 +161,7 @@ public class ConversationRequestTest
         HttpEntity<ConversationRequestDto> requestEntity =
                 new HttpEntity<>(conversationRequestDto, headers);
 
-        String url = restTemplate.getRootUri() + "/api/conversation/request";
-        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = sendPostRequest(url, requestEntity, ConversationRequestResponseDto.class);
+        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = sendPostRequest(getConversationRequestURL(), requestEntity, ConversationRequestResponseDto.class);
 
         Assert.assertEquals("senderIds are not equal", conversationRequestDto.getSenderId(), conversationRequestResponse.getBody().getSenderId());
         Assert.assertEquals("receiverIds are not equal", conversationRequestDto.getReceiverId(), conversationRequestResponse.getBody().getReceiverId());
@@ -195,10 +193,10 @@ public class ConversationRequestTest
         createdTestEmails.add(username2);
 
         LoginRequest loginRequest1 = createLoginRequest(username1, password);
-        ResponseEntity<LoginResponse> response1 = sendPostRequest("/api/auth/login", loginRequest1, LoginResponse.class);
+        ResponseEntity<LoginResponse> response1 = sendPostRequest(getLoginURL(), loginRequest1, LoginResponse.class);
 
         LoginRequest loginRequest2 = createLoginRequest(username2, password);
-        ResponseEntity<LoginResponse> response2 = sendPostRequest("/api/auth/login", loginRequest2, LoginResponse.class);
+        ResponseEntity<LoginResponse> response2 = sendPostRequest(getLoginURL(), loginRequest2, LoginResponse.class);
 
         String token1 = response1.getBody().getToken();
         String token2 = response2.getBody().getToken();
@@ -209,8 +207,7 @@ public class ConversationRequestTest
         HttpEntity<ConversationRequestDto> requestEntity =
                 new HttpEntity<>(conversationRequestDto, headers);
 
-        String url = restTemplate.getRootUri() + "/api/conversation/request";
-        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = sendPostRequest(url, requestEntity, ConversationRequestResponseDto.class);
+        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = sendPostRequest(getConversationRequestURL(), requestEntity, ConversationRequestResponseDto.class);
 
         Assert.assertEquals("senderIds are not equal", conversationRequestDto.getSenderId(), conversationRequestResponse.getBody().getSenderId());
         Assert.assertEquals("receiverIds are not equal", conversationRequestDto.getReceiverId(), conversationRequestResponse.getBody().getReceiverId());
@@ -249,10 +246,10 @@ public class ConversationRequestTest
         createdTestEmails.add(username2);
 
         LoginRequest loginRequest1 = createLoginRequest(username1, password);
-        ResponseEntity<LoginResponse> response1 = sendPostRequest("/api/auth/login", loginRequest1, LoginResponse.class);
+        ResponseEntity<LoginResponse> response1 = sendPostRequest(getLoginURL(), loginRequest1, LoginResponse.class);
 
         LoginRequest loginRequest2 = createLoginRequest(username2, password);
-        ResponseEntity<LoginResponse> response2 = sendPostRequest("/api/auth/login", loginRequest2, LoginResponse.class);
+        ResponseEntity<LoginResponse> response2 = sendPostRequest(getLoginURL(), loginRequest2, LoginResponse.class);
 
         String token1 = response1.getBody().getToken();
         String token2 = response2.getBody().getToken();
@@ -263,8 +260,7 @@ public class ConversationRequestTest
         HttpEntity<ConversationRequestDto> requestEntity =
                 new HttpEntity<>(conversationRequestDto, headers);
 
-        String url = restTemplate.getRootUri() + "/api/conversation/request";
-        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = sendPostRequest(url, requestEntity, ConversationRequestResponseDto.class);
+        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = sendPostRequest(getConversationRequestURL(), requestEntity, ConversationRequestResponseDto.class);
 
         Assert.assertEquals("senderIds are not equal", conversationRequestDto.getSenderId(), conversationRequestResponse.getBody().getSenderId());
         Assert.assertEquals("receiverIds are not equal", conversationRequestDto.getReceiverId(), conversationRequestResponse.getBody().getReceiverId());
@@ -354,5 +350,15 @@ public class ConversationRequestTest
         acceptConversationRequest.setIsAccepted(isAccepted);
 
         return acceptConversationRequest;
+    }
+
+    private String getLoginURL()
+    {
+        return "/api/auth/login";
+    }
+
+    private String getConversationRequestURL()
+    {
+        return "/api/conversation/request";
     }
 }
