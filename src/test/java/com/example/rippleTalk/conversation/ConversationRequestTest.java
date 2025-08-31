@@ -245,6 +245,67 @@ public class ConversationRequestTest
         Assert.assertNotNull(errorResponse.getMessage());
     }
 
+    @ParameterizedTest
+    @ValueSource( booleans = {true, false})
+    public void testAcceptedConversationRequest(boolean isAccepted) throws JsonProcessingException {
+        final User user1 = createUser();
+        final String username1 = user1.getUsername();
+        createdTestEmails.add(username1);
+
+        final User user2 = createUser();
+        final String username2 = user2.getUsername();
+        createdTestEmails.add(username2);
+
+        LoginRequest loginRequest1 = createLoginRequest(username1, password);
+        ResponseEntity<LoginResponse> response1 = sendPostRequest(getLoginURL(), loginRequest1, LoginResponse.class);
+
+        LoginRequest loginRequest2 = createLoginRequest(username2, password);
+        ResponseEntity<LoginResponse> response2 = sendPostRequest(getLoginURL(), loginRequest2, LoginResponse.class);
+
+        String token1 = response1.getBody().getToken();
+        String token2 = response2.getBody().getToken();
+
+        ConversationRequestDto conversationRequestDto = createConversationRequest(username1, username2, RequestStatus.PENDING);
+        HttpHeaders headers = createHttpHeaders(MediaType.APPLICATION_JSON, token1);
+
+        HttpEntity<ConversationRequestDto> requestEntity =
+                new HttpEntity<>(conversationRequestDto, headers);
+
+        String url = "/api/conversation/request";
+        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = sendPostRequest(url, requestEntity, ConversationRequestResponseDto.class);
+
+        Assert.assertEquals("senderIds are not equal", conversationRequestDto.getSenderId(), conversationRequestResponse.getBody().getSenderId());
+        Assert.assertEquals("receiverIds are not equal", conversationRequestDto.getReceiverId(), conversationRequestResponse.getBody().getReceiverId());
+        Assert.assertEquals("conversation request status are not equal",conversationRequestDto.getStatus().toString(), conversationRequestResponse.getBody().getStatus());
+
+        AcceptConversationRequest acceptConversationRequest = createAcceptConversationRequest(conversationRequestResponse.getBody().getRequestId(), true);
+
+        headers.setBearerAuth(token2);
+
+        HttpEntity<AcceptConversationRequest> acceptConversationRequestHttpEntity =
+                new HttpEntity<>(acceptConversationRequest, headers);
+
+        String acceptConversationRequestUrl = restTemplate.getRootUri() + "/api/conversation/request/respond";
+        ResponseEntity<ConversationRequestResponseDto> acceptRequestResponse = sendPostRequest(acceptConversationRequestUrl, acceptConversationRequestHttpEntity, ConversationRequestResponseDto.class);
+
+        Assert.assertEquals("Post accepting request senderIds are not equal", conversationRequestDto.getSenderId(), acceptRequestResponse.getBody().getSenderId());
+        Assert.assertEquals("Post accepting request receiverIds are not equal", conversationRequestDto.getReceiverId(), acceptRequestResponse.getBody().getReceiverId());
+        Assert.assertEquals("Post accepting request status are not equal",RequestStatus.ACCEPTED.toString(), acceptRequestResponse.getBody().getStatus());
+
+        AcceptConversationRequest conversationRequest = createAcceptConversationRequest(conversationRequestResponse.getBody().getRequestId(), isAccepted);
+
+        headers.setBearerAuth(token2);
+
+        HttpEntity<AcceptConversationRequest> acceptConversationRequestHttpEntity2 =
+                new HttpEntity<>(conversationRequest, headers);
+        ResponseEntity<String> rejectRequestResponse2 = sendPostRequest(acceptConversationRequestUrl, acceptConversationRequestHttpEntity2, String.class);
+
+        ObjectMapper mapper = new ObjectMapper();
+        ErrorResponse errorResponse = mapper.readValue(rejectRequestResponse2.getBody(), ErrorResponse.class);
+        Assert.assertEquals("Status codes are not equal.", HttpStatus.CONFLICT.value(), errorResponse.getStatus());
+        Assert.assertNotNull(errorResponse.getMessage());
+    }
+
     private  User createUser()
     {
         User user = new User();
