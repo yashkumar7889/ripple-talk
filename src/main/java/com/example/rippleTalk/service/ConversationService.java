@@ -8,6 +8,7 @@ import com.example.rippleTalk.dto.ConversationRequestResponseDto;
 import com.example.rippleTalk.entity.Conversation;
 import com.example.rippleTalk.entity.ConversationParticipant;
 import com.example.rippleTalk.entity.ConversationRequest;
+import com.example.rippleTalk.exception.BadRequestException;
 import com.example.rippleTalk.exception.ConflictException;
 import com.example.rippleTalk.exception.ResourceNotFoundException;
 import com.example.rippleTalk.repository.ConversationParticipantRepository;
@@ -29,8 +30,12 @@ public class ConversationService
     private final ConversationParticipantRepository participantRepository;
     private final ConversationRequestRepository requestRepository;
 
-    // Step 1: Create request
-    public ConversationRequestResponseDto sendRequest(ConversationRequestDto dto) {
+    public ConversationRequestResponseDto sendRequest(ConversationRequestDto dto)
+    {
+        if(dto.getSenderId().equals(dto.getReceiverId()))
+        {
+            throw new BadRequestException("sender and receiver ids cannot be the same");
+        }
         ConversationRequest request = new ConversationRequest();
         request.setRequestId(UUID.randomUUID().toString());
         request.setSenderId(dto.getSenderId());
@@ -49,7 +54,8 @@ public class ConversationService
     }
 
     @Transactional
-    public ConversationRequestResponseDto respondToRequest(AcceptConversationRequest acceptConversationRequest) {
+    public ConversationRequestResponseDto respondToRequest(AcceptConversationRequest acceptConversationRequest)
+    {
 
         ConversationRequest conversationRequest = requestRepository.findById(acceptConversationRequest.getRequestId()).orElseThrow(() -> new ResourceNotFoundException("Request does not exist"));
 

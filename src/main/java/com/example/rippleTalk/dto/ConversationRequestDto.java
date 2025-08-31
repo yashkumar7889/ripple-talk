@@ -25,9 +25,4 @@ public class ConversationRequestDto
 
     private Instant createdAt = Instant.now();
     private Instant updatedAt;
-
-    @AssertTrue(message = "Sender and Receiver cannot be the same")
-    public boolean isSenderNotSameAsReceiver() {
-        return senderId != null && receiverId != null && !senderId.equals(receiverId);
-    }
 }

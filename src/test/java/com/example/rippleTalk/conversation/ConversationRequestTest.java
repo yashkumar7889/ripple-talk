@@ -23,7 +23,10 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
@@ -87,6 +90,30 @@ public class ConversationRequestTest
         Assert.assertEquals("senderIds are not equal", conversationRequestDto.getSenderId(), conversationRequestResponse.getBody().getSenderId());
         Assert.assertEquals("receiverIds are not equal", conversationRequestDto.getReceiverId(), conversationRequestResponse.getBody().getReceiverId());
         Assert.assertEquals("conversation request status are not equal",conversationRequestDto.getStatus().toString(), conversationRequestResponse.getBody().getStatus());
+    }
+
+    @Test
+    public void testConversationRequestWithSameSenderIds() throws JsonProcessingException {
+        final User user1 = createUser();
+        final String username1 = user1.getUsername();
+        createdTestEmails.add(username1);
+
+        LoginRequest loginRequest = createLoginRequest(username1, password);
+        ResponseEntity<LoginResponse> response = sendPostRequest(getLoginURL(), loginRequest, LoginResponse.class);
+
+        ConversationRequestDto conversationRequestDto = createConversationRequest(username1, username1, RequestStatus.PENDING);
+        HttpHeaders headers = createHttpHeaders(MediaType.APPLICATION_JSON, response.getBody().getToken());
+
+        HttpEntity<ConversationRequestDto> requestEntity =
+                new HttpEntity<>(conversationRequestDto, headers);
+
+        ResponseEntity<String> conversationRequestResponse = sendPostRequest(getConversationRequestURL(), requestEntity, String.class);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, String> responseBodyMap = objectMapper.readValue(conversationRequestResponse.getBody(), Map.class);
+
+        assertEquals(HttpStatus.BAD_REQUEST, conversationRequestResponse.getStatusCode());
+        assertEquals("sender and receiver ids cannot be the same", responseBodyMap.get("error"));
     }
 
     @Test

@@ -19,7 +19,7 @@ public class ConversationRequest {
     private String receiverId;
 
     @Enumerated(EnumType.STRING)
-    private RequestStatus status = RequestStatus.PENDING; // PENDING, ACCEPTED, REJECTED
+    private RequestStatus status = RequestStatus.PENDING;
 
     private Instant createdAt = Instant.now();
     private Instant updatedAt;
