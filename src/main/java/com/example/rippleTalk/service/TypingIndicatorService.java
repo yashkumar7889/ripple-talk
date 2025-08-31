@@ -31,8 +31,8 @@ public class TypingIndicatorService
         }
     }
 
-    public boolean isUserTyping(String conversationId, String userId) {
-        String key = buildRedisKey(conversationId, userId);
+    public boolean isUserTyping(String conversationId, String username) {
+        String key = buildRedisKey(conversationId, username);
         Object value = redisTemplate.opsForValue().get(key);
         if(value == null)
         {
