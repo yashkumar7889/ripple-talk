@@ -11,6 +11,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -182,61 +184,9 @@ public class ConversationRequestTest
         Assert.assertEquals("Post rejecting request status are not equal",RequestStatus.REJECTED.toString(), acceptRequestResponse.getBody().getStatus());
     }
 
-    @Test
-    public void testRejectAlreadyRejectedConversation() throws JsonProcessingException {
-        final User user1 = createUser();
-        final String username1 = user1.getUsername();
-        createdTestEmails.add(username1);
-
-        final User user2 = createUser();
-        final String username2 = user2.getUsername();
-        createdTestEmails.add(username2);
-
-        LoginRequest loginRequest1 = createLoginRequest(username1, password);
-        ResponseEntity<LoginResponse> response1 = sendPostRequest(getLoginURL(), loginRequest1, LoginResponse.class);
-
-        LoginRequest loginRequest2 = createLoginRequest(username2, password);
-        ResponseEntity<LoginResponse> response2 = sendPostRequest(getLoginURL(), loginRequest2, LoginResponse.class);
-
-        String token1 = response1.getBody().getToken();
-        String token2 = response2.getBody().getToken();
-
-        ConversationRequestDto conversationRequestDto = createConversationRequest(username1, username2, RequestStatus.PENDING);
-        HttpHeaders headers = createHttpHeaders(MediaType.APPLICATION_JSON, token1);
-
-        HttpEntity<ConversationRequestDto> requestEntity =
-                new HttpEntity<>(conversationRequestDto, headers);
-
-        ResponseEntity<ConversationRequestResponseDto> conversationRequestResponse = sendPostRequest(getConversationRequestURL(), requestEntity, ConversationRequestResponseDto.class);
-
-        Assert.assertEquals("senderIds are not equal", conversationRequestDto.getSenderId(), conversationRequestResponse.getBody().getSenderId());
-        Assert.assertEquals("receiverIds are not equal", conversationRequestDto.getReceiverId(), conversationRequestResponse.getBody().getReceiverId());
-        Assert.assertEquals("conversation request status are not equal",conversationRequestDto.getStatus().toString(), conversationRequestResponse.getBody().getStatus());
-
-        AcceptConversationRequest rejectConversationRequest = createAcceptConversationRequest(conversationRequestResponse.getBody().getRequestId(), false);
-
-        headers.setBearerAuth(token2);
-
-        HttpEntity<AcceptConversationRequest> acceptConversationRequestHttpEntity =
-                new HttpEntity<>(rejectConversationRequest, headers);
-
-        String acceptConversationRequestUrl = restTemplate.getRootUri() + "/api/conversation/request/respond";
-        ResponseEntity<ConversationRequestResponseDto> acceptRequestResponse = sendPostRequest(acceptConversationRequestUrl, acceptConversationRequestHttpEntity, ConversationRequestResponseDto.class);
-
-        Assert.assertEquals("Post rejecting request senderIds are not equal", conversationRequestDto.getSenderId(), acceptRequestResponse.getBody().getSenderId());
-        Assert.assertEquals("Post rejecting request receiverIds are not equal", conversationRequestDto.getReceiverId(), acceptRequestResponse.getBody().getReceiverId());
-        Assert.assertEquals("Post rejecting request status are not equal",RequestStatus.REJECTED.toString(), acceptRequestResponse.getBody().getStatus());
-
-        ResponseEntity<String> rejectRequestResponse2 = sendPostRequest(acceptConversationRequestUrl, acceptConversationRequestHttpEntity, String.class);
-
-        ObjectMapper mapper = new ObjectMapper();
-        ErrorResponse errorResponse = mapper.readValue(rejectRequestResponse2.getBody(), ErrorResponse.class);
-        Assert.assertEquals("Status codes are not equal.", HttpStatus.CONFLICT.value(), errorResponse.getStatus());
-        Assert.assertNotNull(errorResponse.getMessage());
-    }
-
-    @Test
-    public void testAcceptAlreadyRejectedConversation() throws JsonProcessingException {
+    @ParameterizedTest
+    @ValueSource( booleans = {true, false})
+    public void testRejectedConversation(boolean isAccepted) throws JsonProcessingException {
         final User user1 = createUser();
         final String username1 = user1.getUsername();
         createdTestEmails.add(username1);
@@ -281,7 +231,7 @@ public class ConversationRequestTest
         Assert.assertEquals("Post rejecting request receiverIds are not equal", conversationRequestDto.getReceiverId(), acceptRequestResponse.getBody().getReceiverId());
         Assert.assertEquals("Post rejecting request status are not equal",RequestStatus.REJECTED.toString(), acceptRequestResponse.getBody().getStatus());
 
-        AcceptConversationRequest acceptConversationRequest = createAcceptConversationRequest(conversationRequestResponse.getBody().getRequestId(), true);
+        AcceptConversationRequest acceptConversationRequest = createAcceptConversationRequest(conversationRequestResponse.getBody().getRequestId(), isAccepted);
 
         headers.setBearerAuth(token2);
 
